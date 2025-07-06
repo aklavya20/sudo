@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 
 void main() {
   runApp(const SudoApp());
@@ -70,6 +71,7 @@ class SudoState extends State<Sudo> {
   String? selectedDebug;
   String? selectedOptimization;
   String serverAddress = '';
+  String? pickedFilePath;
   bool isScanning = false;
   final List<String> inputOptions = ['-d', '-dL'];
   final List<String> sourceOptions = ['-s', '-recursive', '-all', '-es'];
@@ -106,35 +108,88 @@ class SudoState extends State<Sudo> {
     commandController.text = command;
   }
 
-  Future<String> sendCommandtoServer(String command) async {
-    final url = Uri.parse(serverAddress);
-    final request = await http.post(url, body: {
-      'command': command,
-    });
-    if (request.statusCode == 200) {
-      return request.body;
+  Future<String?> pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['txt'],
+    );
+    if (result != null && result.files.single.path != null) {
+      return result.files.single.path!;
     } else {
-      showToast("Error:${request.statusCode}");
-      throw Exception("Failed to execute Subfinder Scan");
+      return null;
+    }
+  }
+
+  Future<String> sendCommandToServer({
+    required String command,
+    String? filePath,
+  }) async {
+    final uri = Uri.parse(serverAddress);
+
+    if (filePath != null) {
+      final request = http.MultipartRequest("POST", uri);
+
+      request.fields["command"] = command;
+
+      request.files.add(await http.MultipartFile.fromPath("file", filePath));
+
+      final streamedResponse = await request.send();
+      final responseBody = await streamedResponse.stream.bytesToString();
+
+      if (streamedResponse.statusCode == 200) {
+        return responseBody;
+      } else {
+        showToast("Error: ${streamedResponse.statusCode}");
+        throw Exception("Failed to execute command with file.");
+      }
+    } else {
+      final response = await http.post(uri, body: {
+        'command': command,
+      });
+
+      if (response.statusCode == 200) {
+        return response.body;
+      } else {
+        showToast("Error: ${response.statusCode}");
+        throw Exception("Failed to execute command.");
+      }
     }
   }
 
   Future<void> startScan() async {
-    String command = commandController.text;
-    String target = targetController.text;
-    if (target.isEmpty) {
+    String target = targetController.text.trim();
+
+    if (selectedInput == '-d' && target.isEmpty) {
       showToast("Please enter a target.");
       return;
     }
-    command += ' $target';
-    commandController.text = command;
+
+    if (selectedInput == '-dL' && pickedFilePath == null) {
+      showToast("Please select a file.");
+      return;
+    }
+
+    String command = commandController.text;
+
+    if (selectedInput == '-d') {
+      if (command.contains('-d')) {
+        command = command.replaceAll(RegExp(r'-d(\s+\S+)?'), '-d $target');
+      } else {
+        command += ' -d $target';
+      }
+    }
+
     setState(() {
       isScanning = true;
     });
+
     try {
-      showToast("Scan Started on $target");
-      final Output = await sendCommandtoServer(command);
-      saveScan(Output);
+      showToast("Scan started $target");
+      final output = await sendCommandToServer(
+        command: command,
+        filePath: selectedInput == '-dL' ? pickedFilePath : null,
+      );
+      await saveScan(output);
     } catch (e) {
       showToast("Error executing scan: $e");
     } finally {
@@ -261,19 +316,28 @@ class SudoState extends State<Sudo> {
               ),
             ),
             Padding(
-                padding: const EdgeInsets.only(
-                    top: 0.0, bottom: 6.0, left: 6.0, right: 6.0),
-                child: InkWell(
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.0),
-                      border: Border.all(color: Colors.grey, width: 1.0),
-                    ),
+              padding: const EdgeInsets.only(
+                  top: 0.0, bottom: 6.0, left: 6.0, right: 6.0),
+              child: InkWell(
+                onTap: () async {
+                  final path = await pickFile();
+                  if (path != null) {
+                    setState(() {
+                      pickedFilePath = path;
+                    });
+                    showToast("File Selected: ${path.split('/').last}");
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(color: Colors.grey, width: 1.0),
                   ),
-                )),
+                ),
+              ),
+            ),
             buildDropdownRow('Input', inputOptions, 'Source', sourceOptions,
                 (value) {
               setState(() {
