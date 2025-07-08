@@ -92,12 +92,7 @@ class SudoState extends State<Sudo> {
 
   void updateCommand() {
     String command = 'sudo subfinder';
-    if (selectedInput != null) {
-      command += ' $selectedInput';
-      if (selectedInput == '-d' || selectedInput == '-dL') {
-        command += ' ${targetController.text}';
-      }
-    }
+    if (selectedInput != null) command += ' $selectedInput';
     if (selectedSource != null) command += ' $selectedSource';
     if (selectedFilter != null) command += ' $selectedFilter';
     if (selectedRateLimit != null) command += ' $selectedRateLimit';
@@ -536,7 +531,7 @@ class ScanResultState extends State<ScanResult> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 7,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Sudo"),
