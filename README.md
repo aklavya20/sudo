@@ -160,7 +160,7 @@
 - 6). Now run the project in android studio.
 # Installation of app
 Visit the following url to download the app.
-- url: [nuclear](https://github.com/aklavya20/nuclear/releases/download/nuclear/nuclear.apk)
+- url: [sudo](https://github.com/aklavya20/nuclear/releases/download/sudo/sudo.apk)
 # Usage
 - 1). Download the app.
 - 2). On the right hand corner of the screen you may see the terminal logo here you can enter the custom server address,
