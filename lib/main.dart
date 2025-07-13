@@ -168,10 +168,17 @@ class SudoState extends State<Sudo> {
 
     if (selectedInput == '-d') {
       if (command.contains('-d')) {
-        command = command.replaceAll(RegExp(r'-d(\s+\S+)?'), '-d $target');
-      } else {
+        command = command.replaceAll(RegExp(r'-d(\s+\S+)?'), '');
         command += ' -d $target';
       }
+    }
+
+    if (selectedInput == '-dL') {
+      if (command.contains('-dL')) {
+        command = command.replaceAll(RegExp(r'-dL(\s+\S+)?'), '');
+      }
+      String fileName = pickedFilePath!.split('/').last;
+      command += ' -dL /tmp/sudo/$fileName';
     }
 
     setState(() {
