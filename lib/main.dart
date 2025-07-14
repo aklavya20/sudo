@@ -318,8 +318,7 @@ class SudoState extends State<Sudo> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                  top: 0.0, bottom: 6.0, left: 6.0, right: 6.0),
+              padding: const EdgeInsets.all(6.0),
               child: InkWell(
                 onTap: () async {
                   final path = await pickFile();
@@ -331,18 +330,26 @@ class SudoState extends State<Sudo> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(16.0),
+                  height: 60, //
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10.0),
                     border: Border.all(color: Colors.grey, width: 1.0),
                   ),
-                  child: Column(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Icon(Icons.upload_file),
-                      Text("Select File to be uploaded"),
+                      const Icon(Icons.upload_file),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          pickedFilePath != null
+                              ? pickedFilePath!.split('/').last
+                              : "Select File to be uploaded",
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
                     ],
                   ),
                 ),
