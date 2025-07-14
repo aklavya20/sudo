@@ -337,6 +337,14 @@ class SudoState extends State<Sudo> {
                     borderRadius: BorderRadius.circular(10.0),
                     border: Border.all(color: Colors.grey, width: 1.0),
                   ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(Icons.upload_file),
+                      Text("Select File to be uploaded"),
+                    ],
+                  ),
                 ),
               ),
             ),
