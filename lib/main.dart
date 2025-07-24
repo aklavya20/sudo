@@ -568,6 +568,8 @@ class ScanResultState extends State<ScanResult> {
           title: const Text("Sudo"),
           bottom: const TabBar(
             isScrollable: true,
+            labelColor: Colors.black,
+            indicatorColor: Colors.black,
             tabs: [
               Tab(
                 icon: Icon(Icons.list_alt),
