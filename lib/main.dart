@@ -259,11 +259,17 @@ class SudoState extends State<Sudo> {
                   ),
                   actions: [
                     TextButton(
-                      child: const Text('Cancel'),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(color: Colors.black),
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                     TextButton(
-                      child: const Text('Save'),
+                      child: const Text(
+                        'Save',
+                        style: TextStyle(color: Colors.black),
+                      ),
                       onPressed: () =>
                           Navigator.pop(context, serverController.text),
                     ),
@@ -434,6 +440,8 @@ class SudoState extends State<Sudo> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(
@@ -579,6 +587,8 @@ class ScanResultState extends State<ScanResult> {
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.black,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(
@@ -666,7 +676,6 @@ class _ScanFileListState extends State<ScanFileList> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Column(
       children: [
         Padding(
